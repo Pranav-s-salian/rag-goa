@@ -1,0 +1,12 @@
+{
+  "dataset": "ai4bharat/IndicMSMARCO",
+  "num_passages": 1000,
+  "num_queries": 1000,
+  "language_code": "hi",
+  "total_examples": 1000,
+  "relevance_threshold": 1.0,
+  "queries_with_relevant_passages": 1000,
+  "avg_relevant_passages_per_query": 1.0,
+  "avg_passage_length": 401.021,
+  "avg_query_length": 34.902
+}

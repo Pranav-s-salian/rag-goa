@@ -1,0 +1,173 @@
+# ========================================
+# Python
+# ========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ========================================
+# Virtual Environments
+# ========================================
+venv/
+ENV/
+env/
+.venv
+.virtualenv
+
+# ========================================
+# Environment Variables (SENSITIVE)
+# ========================================
+.env
+.env.local
+.env.production
+.env.development
+# Keep the example file for reference
+!.env.example
+
+# ========================================
+# IDE & Editors
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.code-workspace
+
+# ========================================
+# Large Index & Cache Files (DO NOT PUSH)
+# ========================================
+# FAISS index cache folder (7.8M+ vectors, ~7GB+)
+index_cache/
+# Alternative: if you want to keep folder structure, uncomment below and comment above
+# index_cache/**/*.faiss
+# index_cache/**/*.pkl
+# index_cache/**/*.jsonl
+
+# ONNX models (large binary files)
+models/onnx/
+models/*.onnx
+
+# Archive/backup indices
+models/archive*/
+
+# Any FAISS index files anywhere
+*.faiss
+*.pkl
+*.jsonl
+
+# HuggingFace cache
+.cache/
+*/.cache/
+huggingface/
+transformers_cache/
+
+# ========================================
+# Data Files (Large datasets)
+# ========================================
+# Raw and processed datasets
+data/raw/*
+data/processed/*
+# Keep the stats file and README for reference
+!data/processed/dataset_stats.json
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# ========================================
+# Audio Files (Large, generated)
+# ========================================
+*.wav
+*.mp3
+*.m4a
+*.webm
+*.ogg
+*.flac
+uploads/
+temp_audio/
+
+# ========================================
+# Logs & Temporary Files
+# ========================================
+*.log
+logs/
+*.tmp
+*.temp
+tmp/
+temp/
+
+# ========================================
+# Testing & Evaluation Output
+# ========================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Evaluation results (keep test queries)
+eval/*.json
+eval/*.md
+eval/results/
+!eval/test_queries.json
+
+# ========================================
+# Jupyter Notebooks
+# ========================================
+.ipynb_checkpoints/
+*.ipynb
+# If you want to commit notebooks, uncomment below
+# !notebooks/*.ipynb
+
+# ========================================
+# Docker & Deployment
+# ========================================
+*.tar
+*.gz
+docker-compose.override.yml
+
+# ========================================
+# OS Generated Files
+# ========================================
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Trash-*/
+
+# ========================================
+# Package Manager
+# ========================================
+pip-log.txt
+pip-delete-this-directory.txt
+.Python
+*.egg-info/
+dist/
+build/
+
+# ========================================
+# Misc
+# ========================================
+*.bak
+*.orig
+*.rej
+*.swp
+*~
+.DS_Store

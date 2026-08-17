@@ -1,0 +1,1 @@
+"""Retrieval module with FAISS."""

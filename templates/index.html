@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Enabled RAG System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        textarea, input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        textarea:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-card {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        .result-card.success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+
+        .result-card.error {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .result-card.refused {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .result-content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .sources {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .source-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #666;
+            border-left: 3px solid #667eea;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px dashed #e0e0e0;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .examples {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .examples h4 {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .example-query {
+            display: inline-block;
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+            margin: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-query:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Audio sub-tabs */
+        .audio-sub-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .audio-sub-tab {
+            flex: 1;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .audio-sub-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .audio-sub-tab:hover:not(.active) {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .audio-section {
+            display: none;
+        }
+
+        .audio-section.active {
+            display: block;
+        }
+
+        /* Recording controls */
+        .recording-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-record {
+            width: auto;
+            min-width: 200px;
+            padding: 15px 30px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-record.recording {
+            background: #ef4444;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .recording-indicator {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .recording-indicator.show {
+            display: flex;
+        }
+
+        .pulse-dot {
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse-dot 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        #recordingTime {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recording-info {
+            text-align: center;
+            padding: 15px;
+            background: #e0e7ff;
+            border-radius: 6px;
+            color: #4338ca;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .recording-info.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .recording-info.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 Voice-Enabled RAG System</h1>
+            <p>High-speed retrieval with guardrails and multiple chunking strategies</p>
+            <span class="status-badge" id="statusBadge">Checking...</span>
+        </div>
+
+        <div class="main-card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('text')">💬 Text Query</button>
+                <button class="tab" onclick="switchTab('audio')">🎙️ Audio Query</button>
+            </div>
+
+            <!-- Text Query Tab -->
+            <div id="text-tab" class="tab-content active">
+                <form id="textForm" onsubmit="submitTextQuery(event)">
+                    <div class="form-group">
+                        <label for="queryText">Enter your question:</label>
+                        <textarea id="queryText" name="query" placeholder="What is machine learning?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn" id="textSubmitBtn">🚀 Ask Question</button>
+                </form>
+
+                <div class="examples">
+                    <h4>💡 Try these example queries:</h4>
+                    <span class="example-query" onclick="setExampleQuery('What is machine learning?')">What is machine learning?</span>
+                    <span class="example-query" onclick="setExampleQuery('How does natural language processing work?')">How does NLP work?</span>
+                    <span class="example-query" onclick="setExampleQuery('Explain deep learning')">Explain deep learning</span>
+                    <span class="example-query" onclick="setExampleQuery('What is a vector database?')">What is a vector database?</span>
+                </div>
+            </div>
+
+            <!-- Audio Query Tab -->
+            <div id="audio-tab" class="tab-content">
+                <!-- Sub-tabs for recording vs upload -->
+                <div class="audio-sub-tabs">
+                    <button class="audio-sub-tab active" onclick="switchAudioMode('record')">🎙️ Record Audio</button>
+                    <button class="audio-sub-tab" onclick="switchAudioMode('upload')">📁 Upload File</button>
+                </div>
+
+                <!-- Live Recording Section -->
+                <div id="record-section" class="audio-section active">
+                    <div class="form-group">
+                        <label>Record your question:</label>
+                        <div class="recording-controls">
+                            <button type="button" class="btn btn-record" id="recordBtn" onclick="toggleRecording()">
+                                <span id="recordIcon">🎤</span>
+                                <span id="recordText">Start Recording</span>
+                            </button>
+                            <div class="recording-indicator" id="recordingIndicator">
+                                <span class="pulse-dot"></span>
+                                <span id="recordingTime">0:00</span>
+                            </div>
+                        </div>
+                        <div class="recording-info" id="recordingInfo">
+                            Click the button above to start recording your question in Hindi or English
+                        </div>
+                        <audio id="audioPlayback" controls style="display: none; width: 100%; margin-top: 10px;"></audio>
+                    </div>
+                    <button type="button" class="btn" id="recordSubmitBtn" onclick="submitRecordedAudio()" style="display: none;">
+                        🎤 Process Recording
+                    </button>
+                </div>
+
+                <!-- File Upload Section -->
+                <div id="upload-section" class="audio-section">
+                    <form id="audioForm" onsubmit="submitAudioQuery(event)">
+                        <div class="form-group">
+                            <label for="audioFile">Upload audio file:</label>
+                            <div class="file-input-wrapper">
+                                <label for="audioFile" class="file-input-label" id="fileLabel">
+                                    📁 Click to select audio file (WAV, MP3, M4A)
+                                </label>
+                                <input type="file" id="audioFile" name="audio" accept=".wav,.mp3,.m4a,.ogg,.flac" onchange="updateFileName()">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" id="audioSubmitBtn">🎤 Process Audio</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your query...</p>
+            </div>
+
+            <!-- Results -->
+            <div class="result-card" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for recording
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordingStartTime = null;
+        let recordingTimer = null;
+        let recordedBlob = null;
+
+        // Check system status on load
+        window.onload = function() {
+            fetch('/health')
+                .then(res => res.json())
+                .then(data => {
+                    const badge = document.getElementById('statusBadge');
+                    if (data.status === 'healthy') {
+                        badge.textContent = `✓ Ready (${data.strategy})`;
+                        badge.style.background = '#10b981';
+                    } else {
+                        badge.textContent = '✗ Not Ready';
+                        badge.style.background = '#ef4444';
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('statusBadge').textContent = '✗ Error';
+                    document.getElementById('statusBadge').style.background = '#ef4444';
+                });
+        };
+
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+
+            // Clear results
+            document.getElementById('result').classList.remove('show');
+        }
+
+        function switchAudioMode(mode) {
+            // Update sub-tab buttons
+            document.querySelectorAll('.audio-sub-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update sections
+            document.querySelectorAll('.audio-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(mode + '-section').classList.add('active');
+
+            // Clear results
+            document.getElementById('result').classList.remove('show');
+
+            // Stop recording if switching away from record section
+            if (mode !== 'record' && mediaRecorder && mediaRecorder.state === 'recording') {
+                stopRecording();
+            }
+        }
+
+        function setExampleQuery(query) {
+            document.getElementById('queryText').value = query;
+        }
+
+        function updateFileName() {
+            const input = document.getElementById('audioFile');
+            const label = document.getElementById('fileLabel');
+            if (input.files.length > 0) {
+                label.textContent = `📄 ${input.files[0].name}`;
+            }
+        }
+
+        // ============================================================================
+        // MICROPHONE RECORDING FUNCTIONS
+        // ============================================================================
+
+        async function toggleRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                stopRecording();
+            } else {
+                await startRecording();
+            }
+        }
+
+        async function startRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const recordIcon = document.getElementById('recordIcon');
+            const recordText = document.getElementById('recordText');
+            const indicator = document.getElementById('recordingIndicator');
+            const info = document.getElementById('recordingInfo');
+            const playback = document.getElementById('audioPlayback');
+            const submitBtn = document.getElementById('recordSubmitBtn');
+
+            try {
+                // Request microphone permission
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 44100
+                    } 
+                });
+
+                // Reset state
+                audioChunks = [];
+                recordedBlob = null;
+                playback.style.display = 'none';
+                submitBtn.style.display = 'none';
+
+                // Determine MIME type (prefer webm/opus for broad support)
+                let mimeType = 'audio/webm;codecs=opus';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/webm';
+                    if (!MediaRecorder.isTypeSupported(mimeType)) {
+                        mimeType = 'audio/mp4'; // Fallback
+                    }
+                }
+
+                // Initialize MediaRecorder
+                mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = async () => {
+                    // Stop all tracks
+                    stream.getTracks().forEach(track => track.stop());
+
+                    // Create blob from chunks
+                    recordedBlob = new Blob(audioChunks, { type: mimeType });
+                    
+                    // Show playback
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    playback.src = audioUrl;
+                    playback.style.display = 'block';
+                    submitBtn.style.display = 'block';
+
+                    info.className = 'recording-info success';
+                    info.textContent = `✓ Recording completed (${formatFileSize(recordedBlob.size)}). Review and submit below.`;
+                };
+
+                // Start recording
+                mediaRecorder.start();
+                recordingStartTime = Date.now();
+
+                // Update UI
+                recordBtn.classList.add('recording');
+                recordIcon.textContent = '⏹️';
+                recordText.textContent = 'Stop Recording';
+                indicator.classList.add('show');
+                info.className = 'recording-info';
+                info.textContent = '🎙️ Recording... Speak your question clearly';
+
+                // Start timer
+                updateRecordingTimer();
+                recordingTimer = setInterval(updateRecordingTimer, 1000);
+
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                
+                info.className = 'recording-info error';
+                
+                if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                    info.innerHTML = '❌ Microphone permission denied. Please allow microphone access or use the <strong>Upload File</strong> option instead.';
+                } else if (error.name === 'NotFoundError') {
+                    info.innerHTML = '❌ No microphone found. Please connect a microphone or use the <strong>Upload File</strong> option instead.';
+                } else {
+                    info.innerHTML = `❌ Error: ${error.message}. Try the <strong>Upload File</strong> option instead.`;
+                }
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+
+                // Update UI
+                const recordBtn = document.getElementById('recordBtn');
+                const recordIcon = document.getElementById('recordIcon');
+                const recordText = document.getElementById('recordText');
+                const indicator = document.getElementById('recordingIndicator');
+
+                recordBtn.classList.remove('recording');
+                recordIcon.textContent = '🎤';
+                recordText.textContent = 'Start Recording';
+                indicator.classList.remove('show');
+
+                // Clear timer
+                if (recordingTimer) {
+                    clearInterval(recordingTimer);
+                    recordingTimer = null;
+                }
+            }
+        }
+
+        function updateRecordingTimer() {
+            if (recordingStartTime) {
+                const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('recordingTime').textContent = 
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        async function submitRecordedAudio() {
+            if (!recordedBlob) {
+                alert('No recording available. Please record audio first.');
+                return;
+            }
+
+            const btn = document.getElementById('recordSubmitBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                // Create FormData with the recorded audio blob
+                const formData = new FormData();
+                
+                // Sarvam API accepts various formats including webm, mp3, wav
+                // We'll send as-is and let the backend handle it
+                const fileExtension = recordedBlob.type.includes('webm') ? 'webm' : 
+                                     recordedBlob.type.includes('mp4') ? 'mp4' : 'webm';
+                formData.append('audio', recordedBlob, `recording.${fileExtension}`);
+
+                const response = await fetch('/query/audio', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                displayResult({error: error.message});
+            } finally {
+                btn.disabled = false;
+                loading.classList.remove('show');
+            }
+        }
+
+        // ============================================================================
+        // EXISTING QUERY FUNCTIONS
+        // ============================================================================
+
+        async function submitTextQuery(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('textSubmitBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                const formData = new FormData(event.target);
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                displayResult({error: error.message});
+            } finally {
+                btn.disabled = false;
+                loading.classList.remove('show');
+            }
+        }
+
+        async function submitAudioQuery(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('audioSubmitBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                const formData = new FormData(event.target);
+                const response = await fetch('/query/audio', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                displayResult({error: error.message});
+            } finally {
+                btn.disabled = false;
+                loading.classList.remove('show');
+            }
+        }
+
+        function displayResult(data) {
+            const result = document.getElementById('result');
+            result.classList.add('show');
+
+            if (data.error) {
+                result.className = 'result-card show error';
+                result.innerHTML = `
+                    <div class="result-title">❌ Error</div>
+                    <div class="result-content">${data.error}</div>
+                `;
+                return;
+            }
+
+            if (data.refused) {
+                result.className = 'result-card show refused';
+                result.innerHTML = `
+                    <div class="result-title">⚠️ Query Refused</div>
+                    <div class="result-content">${data.refusal_reason}</div>
+                    ${renderMetrics(data.latency)}
+                `;
+                return;
+            }
+
+            result.className = 'result-card show success';
+            result.innerHTML = `
+                <div class="result-title">✅ Answer</div>
+                <div class="result-content">${data.answer}</div>
+                ${renderMetrics(data.latency)}
+                ${renderSources(data.source_chunks)}
+            `;
+        }
+
+        function renderMetrics(latency) {
+            if (!latency) return '';
+            
+            return `
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value">${latency.retrieval_ms}ms</div>
+                        <div class="metric-label">Retrieval</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${latency.generation_ms}ms</div>
+                        <div class="metric-label">Generation</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${latency.guardrail_ms}ms</div>
+                        <div class="metric-label">Guardrails</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${latency.total_ms}ms</div>
+                        <div class="metric-label">Total</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSources(sources) {
+            if (!sources || sources.length === 0) return '';
+            
+            const sourceItems = sources.map(src => 
+                `<div class="source-item">${src.substring(0, 150)}...</div>`
+            ).join('');
+            
+            return `
+                <div class="sources">
+                    <div class="result-title">📚 Source Context</div>
+                    ${sourceItems}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
