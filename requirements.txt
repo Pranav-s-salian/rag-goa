@@ -1,0 +1,26 @@
+# Web frameworks
+flask==3.0.3
+flask-cors==4.0.1
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+python-dotenv==1.0.1
+werkzeug==3.0.4
+
+# ML / retrieval
+numpy==1.26.4
+torch==2.4.1
+transformers==4.44.2
+optimum[onnxruntime]==1.22.0
+faiss-cpu==1.8.0.post1
+detoxify==0.5.2
+
+# APIs / clients
+groq==0.11.0
+sarvamai==0.1.9
+huggingface_hub==0.25.1
+datasets==2.21.0
+
+# Utilities
+tenacity==9.0.0
+matplotlib==3.9.2
