@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice-Enabled RAG System</title>
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #eef2ff;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --success-border: #a7f3d0;
+            --error: #ef4444;
+            --error-bg: #fef2f2;
+            --error-border: #fecaca;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --warning-border: #fde68a;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --text-faint: #9ca3af;
+            --border: #e5e7eb;
+            --bg-soft: #f9fafb;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
+            --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,74 +37,166 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(160deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
             min-height: 100vh;
-            padding: 20px;
+            padding: 32px 20px;
+            color: var(--text);
+        }
+
+        .icon {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vertical-align: -4px;
+            flex-shrink: 0;
+        }
+
+        .icon-sm {
+            width: 14px;
+            height: 14px;
+            vertical-align: -2px;
+        }
+
+        .icon-lg {
+            width: 26px;
+            height: 26px;
+            vertical-align: -6px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 920px;
             margin: 0 auto;
         }
 
         .header {
             background: white;
-            border-radius: 10px;
-            padding: 30px;
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header-text {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .header-icon-badge .icon {
+            width: 26px;
+            height: 26px;
+            vertical-align: 0;
         }
 
         .header h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 28px;
+            color: var(--text);
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
         }
 
         .header p {
-            color: #666;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 13.5px;
+            margin-top: 4px;
         }
 
         .status-badge {
-            display: inline-block;
-            padding: 5px 12px;
-            background: #10b981;
-            color: white;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            background: var(--bg-soft);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 600;
+            white-space: nowrap;
         }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-faint);
+            flex-shrink: 0;
+        }
+
+        .status-badge.ready {
+            background: var(--success-bg);
+            color: #065f46;
+            border-color: var(--success-border);
+        }
+        .status-badge.ready .status-dot { background: var(--success); }
+
+        .status-badge.error {
+            background: var(--error-bg);
+            color: #991b1b;
+            border-color: var(--error-border);
+        }
+        .status-badge.error .status-dot { background: var(--error); }
 
         .main-card {
             background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow);
             margin-bottom: 20px;
         }
 
         .tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
+            gap: 4px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
         }
 
         .tab {
-            padding: 12px 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 16px;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+            font-size: 14.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            transform: translateY(1px);
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--primary-dark);
         }
 
         .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
 
         .tab-content {
@@ -98,18 +214,20 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 13.5px;
         }
 
         textarea, input[type="file"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
             font-size: 15px;
             font-family: inherit;
-            transition: border-color 0.3s;
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         textarea {
@@ -119,37 +237,48 @@
 
         textarea:focus, input[type="file"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
 
         .btn {
-            padding: 12px 30px;
-            background: #667eea;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
             width: 100%;
         }
 
         .btn:hover:not(:disabled) {
-            background: #5568d3;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .btn:disabled {
-            background: #ccc;
+            background: #d1d5db;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         .loading {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 14px;
         }
 
         .loading.show {
@@ -157,13 +286,13 @@
         }
 
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            width: 36px;
+            height: 36px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
         }
 
         @keyframes spin {
@@ -173,9 +302,10 @@
 
         .result-card {
             display: none;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 22px;
             margin-top: 20px;
         }
 
@@ -184,38 +314,46 @@
         }
 
         .result-card.success {
-            background: #d1fae5;
-            border-left: 4px solid #10b981;
+            background: var(--success-bg);
+            border-color: var(--success-border);
         }
 
         .result-card.error {
-            background: #fee2e2;
-            border-left: 4px solid #ef4444;
+            background: var(--error-bg);
+            border-color: var(--error-border);
         }
 
         .result-card.refused {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
+            background: var(--warning-bg);
+            border-color: var(--warning-border);
         }
 
         .result-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 15px;
         }
 
+        .result-card.success .result-title { color: #065f46; }
+        .result-card.error .result-title { color: #991b1b; }
+        .result-card.refused .result-title { color: #92400e; }
+
         .result-content {
-            line-height: 1.6;
-            color: #333;
+            line-height: 1.65;
+            color: var(--text);
+            font-size: 14.5px;
         }
 
         .metrics {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(0,0,0,0.1);
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(0,0,0,0.08);
         }
 
         .metric {
@@ -223,32 +361,46 @@
         }
 
         .metric-value {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 700;
-            color: #667eea;
+            color: var(--primary-dark);
         }
 
         .metric-label {
-            font-size: 11px;
-            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 10.5px;
+            color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.03em;
             margin-top: 4px;
         }
 
         .sources {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(0,0,0,0.1);
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(0,0,0,0.08);
         }
 
         .source-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
             background: white;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
             margin-bottom: 8px;
             font-size: 13px;
-            color: #666;
-            border-left: 3px solid #667eea;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--primary);
+        }
+
+        .source-item .icon {
+            margin-top: 2px;
+            color: var(--primary);
         }
 
         .file-input-wrapper {
@@ -259,19 +411,26 @@
         }
 
         .file-input-label {
-            display: block;
-            padding: 12px;
-            background: #f8f9fa;
-            border: 2px dashed #e0e0e0;
-            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 14px;
+            background: var(--bg-soft);
+            border: 1.5px dashed var(--border);
+            border-radius: var(--radius-sm);
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
         }
 
         .file-input-label:hover {
-            background: #e9ecef;
-            border-color: #667eea;
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary-dark);
         }
 
         input[type="file"] {
@@ -280,34 +439,44 @@
         }
 
         .examples {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
         }
 
         .examples h4 {
-            font-size: 13px;
-            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 10px;
+        }
+
+        .examples h4 .icon {
+            color: var(--warning);
         }
 
         .example-query {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 7px 13px;
             background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
             font-size: 13px;
-            margin: 4px;
+            color: var(--text);
+            margin: 4px 4px 0 0;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
         }
 
         .example-query:hover {
-            background: #667eea;
+            background: var(--primary);
             color: white;
-            border-color: #667eea;
+            border-color: var(--primary);
         }
 
         /* Audio sub-tabs */
@@ -319,25 +488,31 @@
 
         .audio-sub-tab {
             flex: 1;
-            padding: 10px 20px;
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--bg-soft);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 14px;
-            color: #666;
-            transition: all 0.3s;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
         }
 
         .audio-sub-tab.active {
-            background: #667eea;
+            background: var(--primary);
             color: white;
-            border-color: #667eea;
+            border-color: var(--primary);
         }
 
         .audio-sub-tab:hover:not(.active) {
-            background: #e9ecef;
-            border-color: #667eea;
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary-dark);
         }
 
         .audio-section {
@@ -353,32 +528,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
+            gap: 16px;
+            padding: 28px 20px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             margin-bottom: 15px;
         }
 
         .btn-record {
             width: auto;
-            min-width: 200px;
-            padding: 15px 30px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            min-width: 210px;
+            padding: 15px 32px;
+            font-size: 15.5px;
         }
 
         .btn-record.recording {
-            background: #ef4444;
+            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
             animation: pulse 1.5s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
         }
 
         .recording-indicator {
@@ -387,8 +559,8 @@
             gap: 10px;
             padding: 10px 20px;
             background: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
         }
 
         .recording-indicator.show {
@@ -396,9 +568,9 @@
         }
 
         .pulse-dot {
-            width: 12px;
-            height: 12px;
-            background: #ef4444;
+            width: 10px;
+            height: 10px;
+            background: var(--error);
             border-radius: 50%;
             animation: pulse-dot 1s ease-in-out infinite;
         }
@@ -409,45 +581,66 @@
         }
 
         #recordingTime {
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 16px;
             font-weight: 600;
-            color: #333;
+            color: var(--text);
         }
 
         .recording-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             text-align: center;
-            padding: 15px;
-            background: #e0e7ff;
-            border-radius: 6px;
-            color: #4338ca;
-            font-size: 14px;
+            padding: 13px 16px;
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            color: var(--primary-dark);
+            font-size: 13.5px;
             line-height: 1.5;
         }
 
+        .recording-info .icon {
+            flex-shrink: 0;
+        }
+
         .recording-info.error {
-            background: #fee2e2;
-            color: #dc2626;
+            background: var(--error-bg);
+            color: #b91c1c;
         }
 
         .recording-info.success {
-            background: #d1fae5;
-            color: #065f46;
+            background: var(--success-bg);
+            color: #047857;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎤 Voice-Enabled RAG System</h1>
-            <p>High-speed retrieval with guardrails and multiple chunking strategies</p>
-            <span class="status-badge" id="statusBadge">Checking...</span>
+            <div class="header-text">
+                <div class="header-icon-badge">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </div>
+                <div>
+                    <h1>Voice-Enabled RAG System</h1>
+                    <p>High-speed retrieval with guardrails and multiple chunking strategies</p>
+                </div>
+            </div>
+            <span class="status-badge" id="statusBadge"><span class="status-dot"></span>Checking&hellip;</span>
         </div>
 
         <div class="main-card">
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('text')">💬 Text Query</button>
-                <button class="tab" onclick="switchTab('audio')">🎙️ Audio Query</button>
+                <button class="tab active" onclick="switchTab('text')">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    Text Query
+                </button>
+                <button class="tab" onclick="switchTab('audio')">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                    Audio Query
+                </button>
             </div>
 
             <!-- Text Query Tab -->
@@ -457,11 +650,17 @@
                         <label for="queryText">Enter your question:</label>
                         <textarea id="queryText" name="query" placeholder="What is machine learning?" required></textarea>
                     </div>
-                    <button type="submit" class="btn" id="textSubmitBtn">🚀 Ask Question</button>
+                    <button type="submit" class="btn" id="textSubmitBtn">
+                        <svg class="icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        Ask Question
+                    </button>
                 </form>
 
                 <div class="examples">
-                    <h4>💡 Try these example queries:</h4>
+                    <h4>
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A6 6 0 1 0 7.5 11.5c.76.76 1.23 1.52 1.41 2.5"/></svg>
+                        Try these example queries
+                    </h4>
                     <span class="example-query" onclick="setExampleQuery('What is machine learning?')">What is machine learning?</span>
                     <span class="example-query" onclick="setExampleQuery('How does natural language processing work?')">How does NLP work?</span>
                     <span class="example-query" onclick="setExampleQuery('Explain deep learning')">Explain deep learning</span>
@@ -473,8 +672,14 @@
             <div id="audio-tab" class="tab-content">
                 <!-- Sub-tabs for recording vs upload -->
                 <div class="audio-sub-tabs">
-                    <button class="audio-sub-tab active" onclick="switchAudioMode('record')">🎙️ Record Audio</button>
-                    <button class="audio-sub-tab" onclick="switchAudioMode('upload')">📁 Upload File</button>
+                    <button class="audio-sub-tab active" onclick="switchAudioMode('record')">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        Record Audio
+                    </button>
+                    <button class="audio-sub-tab" onclick="switchAudioMode('upload')">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        Upload File
+                    </button>
                 </div>
 
                 <!-- Live Recording Section -->
@@ -483,7 +688,9 @@
                         <label>Record your question:</label>
                         <div class="recording-controls">
                             <button type="button" class="btn btn-record" id="recordBtn" onclick="toggleRecording()">
-                                <span id="recordIcon">🎤</span>
+                                <span id="recordIcon">
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                                </span>
                                 <span id="recordText">Start Recording</span>
                             </button>
                             <div class="recording-indicator" id="recordingIndicator">
@@ -492,12 +699,14 @@
                             </div>
                         </div>
                         <div class="recording-info" id="recordingInfo">
-                            Click the button above to start recording your question in Hindi or English
+                            <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            <span>Click the button above to start recording your question in Hindi or English</span>
                         </div>
                         <audio id="audioPlayback" controls style="display: none; width: 100%; margin-top: 10px;"></audio>
                     </div>
                     <button type="button" class="btn" id="recordSubmitBtn" onclick="submitRecordedAudio()" style="display: none;">
-                        🎤 Process Recording
+                        <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Process Recording
                     </button>
                 </div>
 
@@ -508,12 +717,16 @@
                             <label for="audioFile">Upload audio file:</label>
                             <div class="file-input-wrapper">
                                 <label for="audioFile" class="file-input-label" id="fileLabel">
-                                    📁 Click to select audio file (WAV, MP3, M4A)
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                    <span>Click to select audio file (WAV, MP3, M4A)</span>
                                 </label>
                                 <input type="file" id="audioFile" name="audio" accept=".wav,.mp3,.m4a,.ogg,.flac" onchange="updateFileName()">
                             </div>
                         </div>
-                        <button type="submit" class="btn" id="audioSubmitBtn">🎤 Process Audio</button>
+                        <button type="submit" class="btn" id="audioSubmitBtn">
+                            <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Process Audio
+                        </button>
                     </form>
                 </div>
             </div>
@@ -521,7 +734,7 @@
             <!-- Loading -->
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Processing your query...</p>
+                <p>Processing your query&hellip;</p>
             </div>
 
             <!-- Results -->
@@ -530,6 +743,19 @@
     </div>
 
     <script>
+        // Reusable inline icon markup, kept as JS strings so dynamically
+        // rendered result/status content can use the same icon set.
+        const ICONS = {
+            check: '<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            alert: '<svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+            xCircle: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+            book: '<svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+            file: '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+            clock: '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            square: '<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+            mic: '<svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>'
+        };
+
         // Global variables for recording
         let mediaRecorder = null;
         let audioChunks = [];
@@ -544,23 +770,24 @@
                 .then(data => {
                     const badge = document.getElementById('statusBadge');
                     if (data.status === 'healthy') {
-                        badge.textContent = `✓ Ready (${data.strategy})`;
-                        badge.style.background = '#10b981';
+                        badge.className = 'status-badge ready';
+                        badge.innerHTML = `<span class="status-dot"></span>Ready (${data.strategy})`;
                     } else {
-                        badge.textContent = '✗ Not Ready';
-                        badge.style.background = '#ef4444';
+                        badge.className = 'status-badge error';
+                        badge.innerHTML = `<span class="status-dot"></span>Not Ready`;
                     }
                 })
                 .catch(err => {
-                    document.getElementById('statusBadge').textContent = '✗ Error';
-                    document.getElementById('statusBadge').style.background = '#ef4444';
+                    const badge = document.getElementById('statusBadge');
+                    badge.className = 'status-badge error';
+                    badge.innerHTML = `<span class="status-dot"></span>Error`;
                 });
         };
 
         function switchTab(tab) {
             // Update tab buttons
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            event.currentTarget.classList.add('active');
 
             // Update tab content
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -573,7 +800,7 @@
         function switchAudioMode(mode) {
             // Update sub-tab buttons
             document.querySelectorAll('.audio-sub-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            event.currentTarget.classList.add('active');
 
             // Update sections
             document.querySelectorAll('.audio-section').forEach(s => s.classList.remove('active'));
@@ -596,7 +823,7 @@
             const input = document.getElementById('audioFile');
             const label = document.getElementById('fileLabel');
             if (input.files.length > 0) {
-                label.textContent = `📄 ${input.files[0].name}`;
+                label.innerHTML = `${ICONS.file}<span>${input.files[0].name}</span>`;
             }
         }
 
@@ -623,12 +850,12 @@
 
             try {
                 // Request microphone permission
-                const stream = await navigator.mediaDevices.getUserMedia({ 
+                const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
                         sampleRate: 44100
-                    } 
+                    }
                 });
 
                 // Reset state
@@ -661,7 +888,7 @@
 
                     // Create blob from chunks
                     recordedBlob = new Blob(audioChunks, { type: mimeType });
-                    
+
                     // Show playback
                     const audioUrl = URL.createObjectURL(recordedBlob);
                     playback.src = audioUrl;
@@ -669,7 +896,7 @@
                     submitBtn.style.display = 'block';
 
                     info.className = 'recording-info success';
-                    info.textContent = `✓ Recording completed (${formatFileSize(recordedBlob.size)}). Review and submit below.`;
+                    info.innerHTML = `${ICONS.check}<span>Recording completed (${formatFileSize(recordedBlob.size)}). Review and submit below.</span>`;
                 };
 
                 // Start recording
@@ -678,11 +905,11 @@
 
                 // Update UI
                 recordBtn.classList.add('recording');
-                recordIcon.textContent = '⏹️';
+                recordIcon.innerHTML = ICONS.square;
                 recordText.textContent = 'Stop Recording';
                 indicator.classList.add('show');
                 info.className = 'recording-info';
-                info.textContent = '🎙️ Recording... Speak your question clearly';
+                info.innerHTML = `${ICONS.mic}<span>Recording&hellip; Speak your question clearly</span>`;
 
                 // Start timer
                 updateRecordingTimer();
@@ -690,15 +917,15 @@
 
             } catch (error) {
                 console.error('Error accessing microphone:', error);
-                
+
                 info.className = 'recording-info error';
-                
+
                 if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-                    info.innerHTML = '❌ Microphone permission denied. Please allow microphone access or use the <strong>Upload File</strong> option instead.';
+                    info.innerHTML = `${ICONS.xCircle}<span>Microphone permission denied. Please allow microphone access or use the <strong>Upload File</strong> option instead.</span>`;
                 } else if (error.name === 'NotFoundError') {
-                    info.innerHTML = '❌ No microphone found. Please connect a microphone or use the <strong>Upload File</strong> option instead.';
+                    info.innerHTML = `${ICONS.xCircle}<span>No microphone found. Please connect a microphone or use the <strong>Upload File</strong> option instead.</span>`;
                 } else {
-                    info.innerHTML = `❌ Error: ${error.message}. Try the <strong>Upload File</strong> option instead.`;
+                    info.innerHTML = `${ICONS.xCircle}<span>Error: ${error.message}. Try the <strong>Upload File</strong> option instead.</span>`;
                 }
             }
         }
@@ -714,7 +941,7 @@
                 const indicator = document.getElementById('recordingIndicator');
 
                 recordBtn.classList.remove('recording');
-                recordIcon.textContent = '🎤';
+                recordIcon.innerHTML = ICONS.mic;
                 recordText.textContent = 'Start Recording';
                 indicator.classList.remove('show');
 
@@ -731,7 +958,7 @@
                 const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
                 const minutes = Math.floor(elapsed / 60);
                 const seconds = elapsed % 60;
-                document.getElementById('recordingTime').textContent = 
+                document.getElementById('recordingTime').textContent =
                     `${minutes}:${seconds.toString().padStart(2, '0')}`;
             }
         }
@@ -751,7 +978,7 @@
             const btn = document.getElementById('recordSubmitBtn');
             const loading = document.getElementById('loading');
             const result = document.getElementById('result');
-            
+
             btn.disabled = true;
             loading.classList.add('show');
             result.classList.remove('show');
@@ -759,10 +986,10 @@
             try {
                 // Create FormData with the recorded audio blob
                 const formData = new FormData();
-                
+
                 // Sarvam API accepts various formats including webm, mp3, wav
                 // We'll send as-is and let the backend handle it
-                const fileExtension = recordedBlob.type.includes('webm') ? 'webm' : 
+                const fileExtension = recordedBlob.type.includes('webm') ? 'webm' :
                                      recordedBlob.type.includes('mp4') ? 'mp4' : 'webm';
                 formData.append('audio', recordedBlob, `recording.${fileExtension}`);
 
@@ -787,11 +1014,11 @@
 
         async function submitTextQuery(event) {
             event.preventDefault();
-            
+
             const btn = document.getElementById('textSubmitBtn');
             const loading = document.getElementById('loading');
             const result = document.getElementById('result');
-            
+
             btn.disabled = true;
             loading.classList.add('show');
             result.classList.remove('show');
@@ -815,11 +1042,11 @@
 
         async function submitAudioQuery(event) {
             event.preventDefault();
-            
+
             const btn = document.getElementById('audioSubmitBtn');
             const loading = document.getElementById('loading');
             const result = document.getElementById('result');
-            
+
             btn.disabled = true;
             loading.classList.add('show');
             result.classList.remove('show');
@@ -848,7 +1075,7 @@
             if (data.error) {
                 result.className = 'result-card show error';
                 result.innerHTML = `
-                    <div class="result-title">❌ Error</div>
+                    <div class="result-title">${ICONS.xCircle} Error</div>
                     <div class="result-content">${data.error}</div>
                 `;
                 return;
@@ -857,7 +1084,7 @@
             if (data.refused) {
                 result.className = 'result-card show refused';
                 result.innerHTML = `
-                    <div class="result-title">⚠️ Query Refused</div>
+                    <div class="result-title">${ICONS.alert} Query Refused</div>
                     <div class="result-content">${data.refusal_reason}</div>
                     ${renderMetrics(data.latency)}
                 `;
@@ -866,7 +1093,7 @@
 
             result.className = 'result-card show success';
             result.innerHTML = `
-                <div class="result-title">✅ Answer</div>
+                <div class="result-title">${ICONS.check} Answer</div>
                 <div class="result-content">${data.answer}</div>
                 ${renderMetrics(data.latency)}
                 ${renderSources(data.source_chunks)}
@@ -875,24 +1102,24 @@
 
         function renderMetrics(latency) {
             if (!latency) return '';
-            
+
             return `
                 <div class="metrics">
                     <div class="metric">
                         <div class="metric-value">${latency.retrieval_ms}ms</div>
-                        <div class="metric-label">Retrieval</div>
+                        <div class="metric-label">${ICONS.clock} Retrieval</div>
                     </div>
                     <div class="metric">
                         <div class="metric-value">${latency.generation_ms}ms</div>
-                        <div class="metric-label">Generation</div>
+                        <div class="metric-label">${ICONS.clock} Generation</div>
                     </div>
                     <div class="metric">
                         <div class="metric-value">${latency.guardrail_ms}ms</div>
-                        <div class="metric-label">Guardrails</div>
+                        <div class="metric-label">${ICONS.clock} Guardrails</div>
                     </div>
                     <div class="metric">
                         <div class="metric-value">${latency.total_ms}ms</div>
-                        <div class="metric-label">Total</div>
+                        <div class="metric-label">${ICONS.clock} Total</div>
                     </div>
                 </div>
             `;
@@ -900,14 +1127,14 @@
 
         function renderSources(sources) {
             if (!sources || sources.length === 0) return '';
-            
-            const sourceItems = sources.map(src => 
-                `<div class="source-item">${src.substring(0, 150)}...</div>`
+
+            const sourceItems = sources.map(src =>
+                `<div class="source-item">${ICONS.file}<span>${src.substring(0, 150)}...</span></div>`
             ).join('');
-            
+
             return `
                 <div class="sources">
-                    <div class="result-title">📚 Source Context</div>
+                    <div class="result-title">${ICONS.book} Source Context</div>
                     ${sourceItems}
                 </div>
             `;

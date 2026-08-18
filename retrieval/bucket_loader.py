@@ -18,7 +18,6 @@ import pickle
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 import faiss
-from huggingface_hub import list_bucket_tree
 from dotenv import load_dotenv
 
 # Load environment variables at module level
@@ -303,6 +302,7 @@ class ProductionIndexLoader:
         try:
             # List all files in bucket using Buckets API
             # list_bucket_tree returns BucketFile objects, extract filenames
+            from huggingface_hub import list_bucket_tree
             bucket_tree = list_bucket_tree(
                 bucket_id=self.bucket_name,
                 token=self.hf_token
